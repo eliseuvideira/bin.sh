@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+exit_with_error() {
+  echo "error: $1"
+  exit 1
+}
+
+read_existing_key() {
+  if [ -f "$HOME/.key" ]; then
+    cat "$HOME/.key"
+  fi
+}
+
+generate_iv() {
+  openssl rand -hex 16
+}
+iv="$(generate_iv)"
+
+while getopts "k:z:" arg; do
+  case $arg in
+    k)
+      key="$OPTARG"
+      ;;
+    z)
+      iv="$OPTARG"
+      ;;
+    *)
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$key" ]; then
+  key="$(read_existing_key)"
+fi
+
+if [ -z "$key" ]; then
+  exit_with_error "can't find \"$HOME/.key\", consider \`openssl rand -hex 32 > \"$HOME/.key\"\`"
+fi
+
+hex_content="$(echo -n "$1" | xxd -p | tr -d \\n)"
+
+encrypt_content() {
+  echo -n "$hex_content" |
+    openssl enc -aes-256-cbc \
+    -K "$key" \
+    -iv "$iv" |
+    xxd -p |
+    tr -d \\n
+}
+
+echo "${iv},$(encrypt_content)"
+

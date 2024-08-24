@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-IFS=, read -r container_name user dbname <<<$(cat "$HOME/.psql_configuration" | jq -r '.container_name+","+.user+","+.dbname')
+config_variables="$(jq -r '.container_name+","+.user+","+.dbname' "$HOME/.psql_configuration")"
+IFS=, read -r container_name user dbname <<<"$config_variables"
 docker exec \
   --tty \
   --interactive \
