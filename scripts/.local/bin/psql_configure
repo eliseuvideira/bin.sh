@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+cat <<EOF |
+{
+  "container_name": "$1",
+  "user": "$2",
+  "dbname": "$3"
+}
+EOF
+  jq -c |
+  tee "$HOME/.psql_configuration"
+
