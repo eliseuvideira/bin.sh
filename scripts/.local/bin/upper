@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+if [ "$#" -gt 0 ]; then
+  echo "$@" | tr '[:lower:]' '[:upper:]'
+else
+  tr '[:lower:]' '[:upper:]'
+fi
+

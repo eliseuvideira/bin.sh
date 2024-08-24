@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+quote='"'
+while getopts "c:" arg; do
+  case $arg in
+    c)
+      quote="$OPTARG"
+      ;;
+    *)
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+sed_pattern="s/^$quote//;s/$quote$//;s/$quote$quote/$quote/g" 
+
+if [ -n "$1" ]; then
+  sed -E "$sed_pattern" "$1"
+else
+  sed -E "$sed_pattern"
+fi
+
