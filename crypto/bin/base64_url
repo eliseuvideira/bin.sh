@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+OPTIONS=$(getopt -o d -l decode -- "$@")
+eval set -- "$OPTIONS"
+decode=false
+while true; do
+  case "$1" in
+    -d | --decode)
+      decode=true
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+input="${1:-$(cat)}"
+if $decode; then
+  content="$(printf "%s" "$input" | tr -- '-_' '+/')"
+  length="${#input}"
+  padding="$(( 4 - "$length" % 4 ))"
+  if [ "$padding" -lt 4 ]; then
+    content+=$(printf "=%.0s" $(seq 1 $padding))
+  fi
+  printf "%s" "$content" |
+    base64 -d
+  exit
+fi
+
+printf "%s" "$input"
+printf "%s" "$input" |
+  base64 |
+  tr -- '+/' '-_' |
+  tr -d '='
+
