@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+OPTIONS=$(getopt -o p -l pretty -- "$@")
+eval set -- "$OPTIONS"
+pretty=false
+while true; do
+  case "$1" in
+    -p | --pretty)
+      pretty=true
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+config_variables="$(jq -r '.container_name+","+.user+","+.dbname' "$HOME/.psql_configuration")"
+IFS=, read -r container_name user dbname <<<"$config_variables"
+input="${1:-$(cat)}"
+if $pretty; then
+  docker exec \
+    "$container_name" \
+      psql \
+      --user="$user" \
+      --dbname="$dbname" \
+      --pset="footer=off" \
+      --pset="expanded" \
+      --quiet \
+      --command="$input"
+  exit
+fi
+
+command="$(echo "$1" | sed -E 's/\s*;\s*$//m')"
+docker exec \
+  "$container_name" \
+    psql \
+    --user="$user" \
+    --dbname="$dbname" \
+    --quiet \
+    --command="\copy ($command) to '/dev/stdout' with csv;"
+

@@ -1,10 +1,17 @@
-.PHONY: install
-install: scripts
+PACKAGES = crypto json psql scripts workspace
 
-.PHONY: scripts
-scripts:
-	stow --no-folding --target $(HOME) scripts
+.PHONY: install
+install: ensure_local
+	for package in $(PACKAGES); do \
+		stow --no-folding --target "$(HOME)/.local" "$$package"; \
+	done
 
 .PHONY: uninstall
 uninstall:
-	stow --no-folding --delete --target $(HOME) scripts
+	for package in $(PACKAGES); do \
+		stow --no-folding --delete --target "$(HOME)/.local" "$$package"; \
+	done
+
+.PHONY: ensure_local
+ensure_local:
+	mkdir -p "$(HOME)/.local"

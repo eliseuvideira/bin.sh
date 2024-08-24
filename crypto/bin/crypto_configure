@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+while getopts "k:" opt; do
+  case $opt in
+    k)
+      key="$OPTARG"
+      ;;
+    *)
+      ;;
+  esac
+done
+
+cat <<EOF |
+{
+  "secret_key": "${key:-$(openssl rand -hex 32)}"
+}
+EOF
+  jq -c |
+  tee "$HOME/.crypto_config.json"
+

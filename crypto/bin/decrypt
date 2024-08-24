@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-generate_key() {
-  if [ -f "$HOME/.key" ]; then
-    cat "$HOME/.key"
-  fi
-}
-key="$(generate_key)"
-
 while getopts "k:" arg; do
   case $arg in
     k)
@@ -17,9 +10,11 @@ while getopts "k:" arg; do
 done
 shift $((OPTIND - 1))
 
-input=${1:-$(cat)}
+if [ -z "$key" ]; then
+  key="$(crypto_config -k secret_key)"
+fi
 
-IFS=, read -r iv encrypted <<<"$input"
+IFS=, read -r iv encrypted <<<"${1:-$(cat)}"
 
 decrypt_content() {
   echo -n "$encrypted" |
