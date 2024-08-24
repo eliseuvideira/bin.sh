@@ -31,7 +31,6 @@ if $decode; then
   exit
 fi
 
-printf "%s" "$input"
 printf "%s" "$input" |
   base64 |
   tr -- '+/' '-_' |
