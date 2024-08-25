@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-OPTIONS=$(getopt -o d -l dry-run -- "$@")
+OPTIONS="$(getopt -o d -l dry-run -- "$@")"
 eval set -- "$OPTIONS"
 
 dry_run=false

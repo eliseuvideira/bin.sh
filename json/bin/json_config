@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-OPTIONS=$(getopt -o k: -l keys: -- "$@")
+OPTIONS="$(getopt -o k: -l keys: -- "$@")"
 eval set -- "$OPTIONS"
 while true; do
     case "$1" in

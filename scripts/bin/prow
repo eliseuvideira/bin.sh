@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 patterns=()
-OPTIONS=$(getopt -o l: -l lines: -- "$@")
+OPTIONS="$(getopt -o l: -l lines: -- "$@")"
 eval set -- "$OPTIONS"
 while true; do
     case "$1" in
