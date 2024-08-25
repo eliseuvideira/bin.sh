@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
 json_config "$@" "$HOME/.crypto_config.json"
-

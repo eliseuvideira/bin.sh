@@ -1,26 +1,24 @@
 #!/usr/bin/env bash
 while getopts "k:" arg; do
-  case $arg in
+    case $arg in
     k)
-      key="$OPTARG"
-      ;;
-    *)
-      ;;
-  esac
+        key="$OPTARG"
+        ;;
+    *) ;;
+    esac
 done
 shift $((OPTIND - 1))
 
 if [ -z "$key" ]; then
-  key="$(crypto_config -k secret_key)"
+    key="$(crypto_config -k secret_key)"
 fi
 
 IFS=, read -r iv encrypted <<<"${1:-$(cat)}"
 
 decrypt_content() {
-  echo -n "$encrypted" |
-    xxd -r -p |
-    openssl enc -aes-256-cbc -d -K "$key" -iv "$iv"
+    echo -n "$encrypted" |
+        xxd -r -p |
+        openssl enc -aes-256-cbc -d -K "$key" -iv "$iv"
 }
 
 printf "%s\n" "$(decrypt_content)"
-
