@@ -13,8 +13,8 @@ if ! [ -p /dev/stdin ] && ! [ "$#" -gt 0 ]; then
     exit_with_error "missing CONTENT argument"
 fi
 
-if [ -p /dev/stdin ]; then
-    tr '[:upper:]' '[:lower:]'
-else
+if [ "$#" -gt 0 ]; then
     echo "$@" | tr '[:upper:]' '[:lower:]'
+else
+    tr '[:upper:]' '[:lower:]'
 fi
