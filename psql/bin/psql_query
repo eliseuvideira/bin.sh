@@ -1,56 +1,70 @@
 #!/usr/bin/env bash
 OPTIONS=$(getopt -o pc:d:u: -l pretty,container-name:,dbname:,user: -- "$@")
 eval set -- "$OPTIONS"
+
 pretty=false
 IFS=, read -r container_name user dbname <<<"$(psql_config --keys container_name,user,dbname)"
 while true; do
-  case "$1" in
+    case "$1" in
     -p | --pretty)
-      pretty=true
-      shift
-      ;;
+        pretty=true
+        shift
+        ;;
     -c | --container-name)
-      container_name="$2"
-      shift 2
-      ;;
+        container_name="$2"
+        shift 2
+        ;;
     -d | --dbname)
-      dbname="$2"
-      shift 2
-      ;;
+        dbname="$2"
+        shift 2
+        ;;
     -u | --user)
-      user="$2"
-      shift 2
-      ;;
+        user="$2"
+        shift 2
+        ;;
     --)
-      shift
-      break
-      ;;
+        shift
+        break
+        ;;
     *)
-      shift
-      ;;
-  esac
+        shift
+        ;;
+    esac
 done
 
-input="${1:-$(cat)}"
-if $pretty; then
-  docker exec \
-    "$container_name" \
-      psql \
-      --user="$user" \
-      --dbname="$dbname" \
-      --pset="footer=off" \
-      --pset="expanded" \
-      --quiet \
-      --command="$input"
-  exit
-fi
+execute_sql_command() {
+    command="$1"
 
-command="$(echo "$1" | sed -E 's/\s*;\s*$//m')"
-docker exec \
-  "$container_name" \
-    psql \
-    --user="$user" \
-    --dbname="$dbname" \
-    --quiet \
-    --command="\copy ($command) to '/dev/stdout' with csv;"
+    if $pretty; then
+        docker exec \
+            "$container_name" \
+            psql \
+            --user="$user" \
+            --dbname="$dbname" \
+            --pset="footer=off" \
+            --pset="expanded" \
+            --quiet \
+            --command="$command"
+        exit
+    fi
+
+    command="$(echo "$command" | sed -E 's/\s*;\s*$//m')"
+    docker exec \
+        "$container_name" \
+        psql \
+        --user="$user" \
+        --dbname="$dbname" \
+        --quiet \
+        --command="\copy ($command) to '/dev/stdout' with csv;"
+}
+
+if [ -p /dev/stdin ]; then
+    while read -r arg; do
+        execute_sql_command "$arg"
+    done
+else
+    for arg in "$@"; do
+        execute_sql_command "$arg"
+    done
+fi
 

@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 usage() {
-  printf "psql_configure: usage: psql_configure CONTAINER_NAME USER DBNAME\n" >&2
+    printf "psql_configure: usage: psql_configure CONTAINER_NAME USER DBNAME\n" >&2
 }
 
 exit_with_error() {
-  printf "psql_configure: error: %s\n" "$1" >&2
-  usage
-  exit 1
+    printf "psql_configure: error: %s\n" "$1" >&2
+    usage
+    exit 1
 }
 
 if [ "$#" != "3" ]; then
-  exit_with_error "invalid number of arguments"
+    exit_with_error "invalid number of arguments"
 fi
 
 cat <<EOF |
@@ -20,6 +20,5 @@ cat <<EOF |
   "dbname": "$3"
 }
 EOF
-  jq -cMS |
-  tee "$HOME/.psql_config.json"
-
+    jq -cMS |
+    tee "$HOME/.psql_config.json"
