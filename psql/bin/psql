@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-config_variables="$(jq -r '.container_name+","+.user+","+.dbname' "$HOME/.psql_configuration")"
-IFS=, read -r container_name user dbname <<<"$config_variables"
+IFS=, read -r container_name user dbname <<<"$(psql_config -k container_name,user,dbname)"
+
 docker exec \
-  --tty \
-  --interactive \
-  "$container_name" \
+    --tty \
+    --interactive \
+    "$container_name" \
     psql \
     --user="$user" \
     --dbname="$dbname" \
     -P 'pager=off' \
     -P 'expanded=on'
-
