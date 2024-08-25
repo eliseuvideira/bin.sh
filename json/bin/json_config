@@ -41,12 +41,12 @@ if ! [ -p /dev/stdin ] && ! [ "$#" -gt 0 ]; then
     exit_with_error "missing json_file argument"
 fi
 
-if [ -p /dev/stdin ]; then
-    while read -r arg; do
+if [ "$#" -gt 0 ]; then
+    for arg in "$@"; do
         get_json_config "$arg"
     done
 else
-    for arg in "$@"; do
+    while read -r arg; do
         get_json_config "$arg"
     done
 fi
