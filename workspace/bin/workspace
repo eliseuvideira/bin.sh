@@ -2,11 +2,12 @@
 workspace_root="$HOME/Workspace"
 workspace_name="$1"
 workspace_prefix="$(date +%Y_%m_%d_%H_%M_%S)"
+
 if [ -n "$workspace_name" ]; then
   workspace_directory="${workspace_root}/${workspace_prefix}_${workspace_name}"
 else
   workspace_directory="${workspace_root}/${workspace_prefix}"
 fi
+
 mkdir -p "$workspace_directory"
 printf "%s" "$workspace_directory"
-
