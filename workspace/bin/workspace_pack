@@ -5,17 +5,17 @@ eval set -- "$OPTIONS"
 dry_run=false
 while true; do
   case "$1" in
-    -d | --dry-run)
-      dry_run=true
-      shift
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      shift
-      ;;
+  -d | --dry-run)
+    dry_run=true
+    shift
+    ;;
+  --)
+    shift
+    break
+    ;;
+  *)
+    shift
+    ;;
   esac
 done
 
