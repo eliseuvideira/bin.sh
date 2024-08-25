@@ -3,28 +3,29 @@ patterns=()
 OPTIONS=$(getopt -o l: -l lines: -- "$@")
 eval set -- "$OPTIONS"
 while true; do
-  case "$1" in
+    case "$1" in
     -l | --lines)
-      patterns+=("$2")
-      shift 2
-      ;;
+        patterns+=("$2")
+        shift 2
+        ;;
     --)
-      shift
-      break
-      ;;
+        shift
+        break
+        ;;
     *)
-      shift
-      ;;
-  esac
+        shift
+        ;;
+    esac
 done
+
 sed_pattern=""
 if [ ${#patterns[@]} -gt 0 ]; then
-  for pattern in "${patterns[@]}"; do
-    sed_pattern="${sed_pattern};${pattern}p"
-  done
-  sed_pattern="${sed_pattern:1}"
+    for pattern in "${patterns[@]}"; do
+        sed_pattern="${sed_pattern};${pattern}p"
+    done
+    sed_pattern="${sed_pattern:1}"
 else
-  sed_pattern="1p"
+    sed_pattern="1p"
 fi
-sed -n "$sed_pattern"
 
+sed -n "$sed_pattern"
