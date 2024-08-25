@@ -1,6 +1,6 @@
+use csv::ReaderBuilder;
 use std::error::Error;
 use std::io::{self, BufRead};
-use csv::ReaderBuilder;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let stdin = io::stdin();
@@ -15,7 +15,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn transpose_csv<R: BufRead>(reader: R) -> Result<Vec<String>, Box<dyn Error>> {
-    let mut csv_reader = ReaderBuilder::new().has_headers(false).from_reader(reader);
+    let mut csv_reader = ReaderBuilder::new()
+        .has_headers(false)
+        .flexible(true)
+        .from_reader(reader);
     let mut rows = Vec::new();
 
     for result in csv_reader.records() {
