@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-OPTIONS="$(getopt -o x: -l hash-key: -- "$@")"
+OPTIONS="$(getopt -o x:0 -l hash-key: -- "$@")"
 eval set -- "$OPTIONS"
+
+new_lines=false
 while true; do
   case $1 in
     -x | --hash-key)
       hash_key="$2"
       shift 2
+      ;;
+    -0)
+      new_lines=true
+      shift
       ;;
     --)
       shift
@@ -21,7 +27,25 @@ if [ -z "$hash_key" ]; then
   hash_key="$(crypto_config --keys hash_key)"
 fi
 
-echo -n "${1:-$(cat)}" |
-  openssl dgst -hex -sha256 -hmac "$hash_key" -binary |
-  xxd -p -c 256
+if $new_lines; then
+    if [ "$#" -gt 0 ]; then
+        openssl dgst -hex -sha256 -hmac "$hash_key" -binary <<<"$@" |
+            xxd -p -c 256
+    else
+        openssl dgst -hex -sha256 -hmac "$hash_key" -binary |
+            xxd -p -c 256
+    fi
+else
+    if [ "$#" -gt 0 ]; then
+        echo -n "$@" |
+            openssl dgst -hex -sha256 -hmac "$hash_key" -binary |
+            xxd -p -c 256
+    else
+        while read -r line; do
+            echo -n "$line" |
+                openssl dgst -hex -sha256 -hmac "$hash_key" -binary |
+                xxd -p -c 256
+        done
+    fi
+fi
 
