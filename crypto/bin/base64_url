@@ -37,8 +37,8 @@ encode_content() {
         tr -d '='
 }
 
-if [ -p /dev/stdin ]; then
-    while read -r arg; do
+if [ "$#" -gt 0 ]; then
+    for arg in "$@"; do
         if $decode; then
             decode_content "$arg"
         else
@@ -46,7 +46,7 @@ if [ -p /dev/stdin ]; then
         fi
     done
 else
-    for arg in "$@"; do
+    while read -r arg; do
         if $decode; then
             decode_content "$arg"
         else
