@@ -9,6 +9,16 @@ install: ensure_local_bin_directory build_rust
 		stow --no-folding --target "$(HOME)/.local" "$$package"; \
 	done
 
+.PHONY: uninstall
+uninstall:
+	for package in $(PACKAGES); do \
+		stow --no-folding --delete --target "$(HOME)/.local" "$$package"; \
+	done
+
+.PHONY: ensure_local_bin_directory
+ensure_local_bin_directory:
+	mkdir -p "$(HOME)/.local"
+
 .PHONY: build_rust
 build_rust: ensure_rust_bin_directory
 	for dir in $(RUST_PACKAGES); do \
@@ -20,13 +30,3 @@ build_rust: ensure_rust_bin_directory
 .PHONY: ensure_rust_bin_directory
 ensure_rust_bin_directory:
 	mkdir -p "$(RUST_BIN_DIRECTORY)/bin"
-
-.PHONY: uninstall
-uninstall:
-	for package in $(PACKAGES); do \
-		stow --no-folding --delete --target "$(HOME)/.local" "$$package"; \
-	done
-
-.PHONY: ensure_local_bin_directory
-ensure_local_bin_directory:
-	mkdir -p "$(HOME)/.local"
