@@ -58,13 +58,12 @@ execute_sql_command() {
         --command="\copy ($command) to '/dev/stdout' with csv;"
 }
 
-if [ -p /dev/stdin ]; then
-    while read -r arg; do
-        execute_sql_command "$arg"
-    done
-else
+if [ "$#" -gt 0 ]; then
     for arg in "$@"; do
         execute_sql_command "$arg"
     done
+else
+    while read -r arg; do
+        execute_sql_command "$arg"
+    done
 fi
-
