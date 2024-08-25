@@ -1,36 +1,34 @@
 #!/usr/bin/env bash
 while getopts "k:z:" arg; do
-  case $arg in
+    case $arg in
     k)
-      key="$OPTARG"
-      ;;
+        key="$OPTARG"
+        ;;
     z)
-      iv="$OPTARG"
-      ;;
-    *)
-      ;;
-  esac
+        iv="$OPTARG"
+        ;;
+    *) ;;
+    esac
 done
 shift $((OPTIND - 1))
 
 if [ -z "$iv" ]; then
-  iv="$(openssl rand -hex 16)"
+    iv="$(openssl rand -hex 16)"
 fi
 
 if [ -z "$key" ]; then
-  key="$(crypto_config -k secret_key)"
+    key="$(crypto_config -k secret_key)"
 fi
 
 input="${1:-$(cat)}"
 
 encrypt_content() {
-  echo -n "$input" |
-    openssl enc -aes-256-cbc \
-    -K "$key" \
-    -iv "$iv" |
-    xxd -p |
-    tr -d \\n
+    echo -n "$input" |
+        openssl enc -aes-256-cbc \
+            -K "$key" \
+            -iv "$iv" |
+        xxd -p |
+        tr -d \\n
 }
 
 printf "%s,%s\n" "${iv}" "$(encrypt_content)"
-
