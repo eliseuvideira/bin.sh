@@ -1,14 +1,23 @@
 #!/usr/bin/env bash
+OPTIONS="$(getopt -o c: -l quote: -- "$@")"
+eval set -- "$OPTIONS"
+
 quote='"'
-while getopts "c:" arg; do
-    case $arg in
-    c)
-        quote="$OPTARG"
+while true; do
+    case "$1" in
+    -c | --quote)
+        quote="$2"
+        shift 2
         ;;
-    *) ;;
+    --)
+        shift
+        break
+        ;;
+    *)
+        shift
+        ;;
     esac
 done
-shift $((OPTIND - 1))
 
 sed_pattern="s/^$quote//;s/$quote$//;s/$quote$quote/$quote/g"
 
