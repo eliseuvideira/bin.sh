@@ -2,51 +2,51 @@
 OPTIONS=$(getopt -o k: -l keys: -- "$@")
 eval set -- "$OPTIONS"
 while true; do
-  case "$1" in
-  -k | --keys)
-    keys="$2"
-    shift 2
-    ;;
-  --)
-    shift
-    break
-    ;;
-  *)
-    shift
-    ;;
-  esac
+    case "$1" in
+    -k | --keys)
+        keys="$2"
+        shift 2
+        ;;
+    --)
+        shift
+        break
+        ;;
+    *)
+        shift
+        ;;
+    esac
 done
 
 usage() {
-  printf "json_config: usage: json_config [-k|--keys=key1,key2,...] json_file,...\n" >&2
+    printf "json_config: usage: json_config [-k|--keys=key1,key2,...] json_file,...\n" >&2
 }
 
 exit_with_error() {
-  printf "json_config: error: %s\n" "$1" >&2
-  usage
-  exit 1
+    printf "json_config: error: %s\n" "$1" >&2
+    usage
+    exit 1
 }
 
 get_json_config() {
-  json_file="$1"
-  if [ -n "$keys" ]; then
-    jq_filter=$(printf "%s" "$keys" | sed -E 's/^/./;s/,/,./g')
-    jq -Mr "${jq_filter}" "$json_file" | paste -s -d ,
-  else
-    jq -Mc '.' "$json_file"
-  fi
+    json_file="$1"
+    if [ -n "$keys" ]; then
+        jq_filter=$(printf "%s" "$keys" | sed -E 's/^/./;s/,/,./g')
+        jq -Mr "${jq_filter}" "$json_file" | paste -s -d ,
+    else
+        jq -Mrc '.' "$json_file"
+    fi
 }
 
 if ! [ -p /dev/stdin ] && ! [ "$#" -gt 0 ]; then
-  exit_with_error "missing json_file argument"
+    exit_with_error "missing json_file argument"
 fi
 
 if [ -p /dev/stdin ]; then
-  while read -r arg; do
-    get_json_config "$arg"
-  done
+    while read -r arg; do
+        get_json_config "$arg"
+    done
 else
-  for arg in "$@"; do
-    get_json_config "$arg"
-  done
+    for arg in "$@"; do
+        get_json_config "$arg"
+    done
 fi
