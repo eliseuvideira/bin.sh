@@ -22,10 +22,9 @@ if [ -z "$key" ]; then
 fi
 
 input="${1:-$(cat)}"
-hex_content="$(echo -n "$input" | xxd -p | tr -d \\n)"
 
 encrypt_content() {
-  echo -n "$hex_content" |
+  echo -n "$input" |
     openssl enc -aes-256-cbc \
     -K "$key" \
     -iv "$iv" |

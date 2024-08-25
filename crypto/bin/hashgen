@@ -1,7 +1,27 @@
 #!/usr/bin/env bash
-hash_key="$(crypto_config --keys hash_key)"
-input="${1:-$(cat)}"
-echo -n "$input" |
+OPTIONS="$(getopt -o x: -l hash-key: -- "$@")"
+eval set -- "$OPTIONS"
+while true; do
+  case $1 in
+    -x | --hash-key)
+      hash_key="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$hash_key" ]; then
+  hash_key="$(crypto_config --keys hash_key)"
+fi
+
+echo -n "${1:-$(cat)}" |
   openssl dgst -hex -sha256 -hmac "$hash_key" -binary |
   xxd -p -c 256
 

@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
-OPTIONS=$(getopt -o p -l pretty -- "$@")
+OPTIONS=$(getopt -o pc:d:u: -l pretty,container-name:,dbname:,user: -- "$@")
 eval set -- "$OPTIONS"
 pretty=false
+IFS=, read -r container_name user dbname <<<"$(psql_config --keys container_name,user,dbname)"
 while true; do
   case "$1" in
     -p | --pretty)
       pretty=true
       shift
+      ;;
+    -c | --container-name)
+      container_name="$2"
+      shift 2
+      ;;
+    -d | --dbname)
+      dbname="$2"
+      shift 2
+      ;;
+    -u | --user)
+      user="$2"
+      shift 2
       ;;
     --)
       shift
@@ -18,8 +31,6 @@ while true; do
   esac
 done
 
-config_variables="$(jq -r '.container_name+","+.user+","+.dbname' "$HOME/.psql_configuration")"
-IFS=, read -r container_name user dbname <<<"$config_variables"
 input="${1:-$(cat)}"
 if $pretty; then
   docker exec \

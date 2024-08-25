@@ -19,9 +19,7 @@ IFS=, read -r iv encrypted <<<"${1:-$(cat)}"
 decrypt_content() {
   echo -n "$encrypted" |
     xxd -r -p |
-    openssl enc -aes-256-cbc -d -K "$key" -iv "$iv" |
-    xxd -r -p
-  exit
+    openssl enc -aes-256-cbc -d -K "$key" -iv "$iv"
 }
 
 printf "%s\n" "$(decrypt_content)"
