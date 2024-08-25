@@ -21,8 +21,10 @@ done
 
 sed_pattern="s/^$quote//;s/$quote$//;s/$quote$quote/$quote/g"
 
-if [ -n "$1" ]; then
-    sed -E "$sed_pattern" "$1"
+if [ "$#" -gt 0 ]; then
+    for arg in "$@"; do
+        sed -E "$sed_pattern" <<<"$arg"
+    done
 else
     sed -E "$sed_pattern"
 fi
