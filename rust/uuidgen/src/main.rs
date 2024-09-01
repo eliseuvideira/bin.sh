@@ -32,11 +32,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         Some(("-7", args)) => {
-            let timestamp_arg = args.get_one::<i32>("timestamp");
+            let timestamp_arg = args.get_one::<String>("timestamp");
             let timestamp = match timestamp_arg {
-                Some(&timestamp_value) => {
-                    Timestamp::from_unix(NoContext, timestamp_value as u64, 0)
-                } // Assuming you need to convert from i32 to u64
+                Some(timestamp_value) => {
+                    let timestamp_value = timestamp_value.parse::<u64>()?;
+                    Timestamp::from_unix(NoContext, timestamp_value, 0)
+                }
                 None => {
                     let now = SystemTime::now()
                         .duration_since(UNIX_EPOCH)
