@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+OPTIONS="$(getopt -o d: -l delimiter: -- "$@")"
+eval set -- "$OPTIONS"
+
+delimiter=" "
+while true; do
+  case "$1" in
+    -d | --delimiter)
+      delimiter="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+tr "$delimiter" \\n
+

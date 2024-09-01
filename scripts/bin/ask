@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+OPTIONS="$(getopt -o x: -l conversation: -- "$@")"
+eval set -- "$OPTIONS"
+
+conversation_id="$(uuidgen)"
+while :; do
+    case "$1" in
+    -x | --conversation)
+        conversation_id="$2"
+        shift 2
+        ;;
+    --)
+        shift
+        break
+        ;;
+    *)
+        shift
+        ;;
+    esac
+done
+
+ASK_DIR="$HOME/.ask"
+if [ ! -d "$ASK_DIR" ]; then
+    mkdir -p "$ASK_DIR"
+fi
+
+if [ ! -f "$ASK_DIR/$conversation_id" ]; then
+    cat <<EOF >>"$ASK_DIR/$conversation_id"
+A HUMAN AND AI ASSISTANT CONVERSATION
+THE CONVERSATION WILL NOT END UNTIL "--- END ---" APPEARS
+--- HUMAN ---
+Hello, AI ASSISTANT.
+Please help me out with my inquiries.
+Here are the guidelines that you should always keep in mind during this conversation.
+1. Be OBJECTIVE, and QUICK with your answers, DO NOT introduce unnecessary details, keep in theme always.
+2. In case of doubt, DO NOT invent an answer, say you don't know.
+3. Be engaging and don't close the conversation
+Thank you, let's have a great conversation.
+--- AI ASSISTANT ---
+OK! I will keep this in mind for the duration of the conversation.
+I'm here to help!
+--- HUMAN ---
+EOF
+else
+    cat <<EOF >>"$ASK_DIR/$conversation_id"
+--- HUMAN ---
+EOF
+fi
+
+vim "$ASK_DIR/$conversation_id"
+
+if [[ "$(tail -1 "$ASK_DIR/$conversation_id")" == "--- HUMAN ---" ]]; then
+    cat <<EOF >>"$ASK_DIR/$conversation_id"
+Please provide more details about the previous answer
+EOF
+fi
+
+cat <<EOF >>"$ASK_DIR/$conversation_id"
+--- AI ASSISTANT ---
+EOF
+
+answer="$(mktemp)"
+
+ollama run llama3 <"$ASK_DIR/$conversation_id" |
+    tee "$answer"
+
+cat "$answer" >>"$ASK_DIR/$conversation_id"
