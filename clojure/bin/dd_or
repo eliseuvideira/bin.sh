@@ -1,0 +1,9 @@
+#!/usr/bin/env bb
+
+(def args
+  (if (seq *command-line-args*)
+    (map clojure.string/trim *command-line-args*)
+    (map clojure.string/trim
+         (clojure.string/split (slurp *in*) #"\s+"))))
+
+(println (clojure.string/join " OR " args))

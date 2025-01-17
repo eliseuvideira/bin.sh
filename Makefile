@@ -1,4 +1,4 @@
-PACKAGES = .rust_bin crypto json psql scripts workspace
+PACKAGES = .rust_bin clojure crypto json psql scripts workspace
 RUST_DIRECTORY = $(CURDIR)/rust
 RUST_PACKAGES = $(shell find $(RUST_DIRECTORY) -mindepth 1 -maxdepth 1 -type d -print)
 RUST_BIN_DIRECTORY = $(CURDIR)/.rust_bin
