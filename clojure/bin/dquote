@@ -4,6 +4,6 @@
   (if (seq *command-line-args*)
     (map clojure.string/trim *command-line-args*)
     (map clojure.string/trim
-         (clojure.string/split (slurp *in*) #"\s+"))))
+         (clojure.string/split (slurp *in*) #"\n"))))
 
-(println (clojure.string/join "," (map #(str "'" % "'") args)))
+(run! #(println (str "\"" % "\"")) args)

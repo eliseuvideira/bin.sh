@@ -10,4 +10,9 @@ else
 fi
 
 mkdir -p "$workspace_directory"
+
+if [ -z "$CLAUDE_FILE" ]; then
+	cp "$CLAUDE_FILE" "$workspace_directory"
+fi
+
 printf "%s" "$workspace_directory"

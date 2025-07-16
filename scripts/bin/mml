@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+origin="$(ls "$HOME/Downloads/${1}"* -t | head -1)"
+destination="$2"
+
+extension=""
+if [[ "$destination" =~ \.[^.]+$ ]]; then
+  extension="${destination##*.}"
+  basename="${destination%.*}"
+else
+  basename="$destination"
+fi
+
+destination_dir="$(dirname "$(realpath "$destination")")"
+
+latest_file="$(ls -t "$destination_dir" | grep -E "^${basename}_[0-9]+(\.${extension})?$" | head -1)"
+
+destination_path=""
+if [[ "$latest_file" =~ ^${basename}_[0-9]+(\.${extension})?$ ]]; then
+  number="${latest_file##*_}"
+  number="${number%.*}"
+  number="$(printf "%s" "$number" | sed -E 's/^0+//')"
+  number=$((number + 1))
+  number="$(printf "%03d" "$number")"
+  if [ -z "$extension" ]; then
+    destination_path="${destination_dir}/${basename}_${number}"
+  else
+    destination_path="${destination_dir}/${basename}_${number}.${extension}"
+  fi
+else
+  if [ -z "$extension" ]; then
+    destination_path="${destination_dir}/${basename}_001"
+  else
+    destination_path="${destination_dir}/${basename}_001.${extension}"
+  fi
+fi
+
+mv "$origin" "$destination_path"
+
+realpath --relative-to="." "$destination_path"
