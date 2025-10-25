@@ -15,4 +15,10 @@ if [ -f "$HOME/CLAUDE.md" ]; then
 	cp "$HOME/CLAUDE.md" "$workspace_directory"
 fi
 
+if [ -d "$HOME/.cursor/rules" ]; then
+	mkdir -p "$workspace_directory/.cursor"
+	cp -r "$HOME/.cursor/rules" "$workspace_directory/.cursor/rules"
+fi
+
 printf "%s" "$workspace_directory"
+
