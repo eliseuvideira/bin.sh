@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+history_file="$HOME/.claude/history.jsonl"
+
+if [ ! -f "$history_file" ]; then
+  echo "error: $history_file not found" >&2
+  exit 1
+fi
+
+opts="$(getopt -o 'cp:g:' -l 'cwd,project:,grep:' -- "$@")" || exit 1
+eval set -- "$opts"
+
+cwd=false
+pattern=""
+grep_pattern=""
+
+while true; do
+  case "$1" in
+    -c|--cwd)     cwd=true; shift ;;
+    -p|--project) pattern="$2"; shift 2 ;;
+    -g|--grep)    grep_pattern="$2"; shift 2 ;;
+    --)           shift; break ;;
+  esac
+done
+
+n="${1:-10}"
+
+filter_project() {
+  if [ "$cwd" = true ]; then
+    jq -c --arg dir "$PWD" 'select(.project // "" | contains($dir))'
+  elif [ -n "$pattern" ]; then
+    jq -c --arg pat "$pattern" 'select(.project // "" | test($pat))'
+  else
+    cat
+  fi
+}
+
+filter_message() {
+  if [ -n "$grep_pattern" ]; then
+    jq -c --arg pat "$grep_pattern" 'select(.display // "" | test($pat; "i"))'
+  else
+    cat
+  fi
+}
+
+tty=true
+if [ ! -t 1 ]; then
+  tty=false
+fi
+
+tail -n 1000 "$history_file" | filter_project | filter_message | tail -n "$n" | while IFS= read -r line; do
+  display="$(printf '%s' "$line" | jq -r '.display')"
+
+  if [ "$tty" = true ]; then
+    timestamp="$(printf '%s' "$line" | jq -r '.timestamp')"
+    project="$(printf '%s' "$line" | jq -r '.project // ""')"
+    date_str="$(date -d "@$((timestamp / 1000))" '+%Y-%m-%d %H:%M')"
+    project_name="$(basename "$project")"
+    printf '\033[2m%s\033[0m  \033[36m%s\033[0m\n' "$date_str" "$project_name"
+  fi
+
+  printf '%s\n\n' "$display"
+done

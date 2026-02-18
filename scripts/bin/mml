@@ -13,7 +13,7 @@ fi
 
 destination_dir="$(dirname "$(realpath "$destination")")"
 
-latest_file="$(ls -t "$destination_dir" | grep -E "^${basename}_[0-9]+(\.${extension})?$" | head -1)"
+latest_file="$(ls "$destination_dir" | grep -E "^${basename}_[0-9]+(\.${extension})?$" | sort -t_ -k2 -n | tail -1)"
 
 destination_path=""
 if [[ "$latest_file" =~ ^${basename}_[0-9]+(\.${extension})?$ ]]; then
